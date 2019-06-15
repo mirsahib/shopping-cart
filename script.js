@@ -16,6 +16,7 @@ $(document).ready(function(){
   // Basic tasks
   // 1. Show / hide cart section on button click (Cart button / close cutton)
   // 2. Dynamically load products to view
+  
   // 3. Dynamically show total items in Cart
   // 4. Add to cart button functionality
   // 5. Dynamically load cart items
