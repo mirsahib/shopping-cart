@@ -25,6 +25,25 @@ var cart = {
   items: [],
   total: 0
 };
+var db;
+var request = window.indexedDB.open("Cart", 1);
+ 
+request.onerror = function(event) {
+  console.log("error: ");
+};
+ 
+request.onsuccess = function(event) {
+  db = request.result;
+  console.log("success: "+ db);
+};
+ 
+request.onupgradeneeded = function(event) {
+        var db = event.target.result;
+        var objectStore = db.createObjectStore("cart_product", {keyPath:"name"});
+        for (var i in cart.items) {
+                objectStore.add(cart.items[i]);      
+        }
+}
 
 $(document).ready(function(){
   //console.log("Start here");
@@ -81,9 +100,7 @@ function loadProduct(){
   })
 }
 function showCart(){
-  $('#cart').css('display','block')
-  $('#products').css('display','none')
-  loadCart()
+  init()
 }
 function showProduct(){
   $('#products').css('display','block')
@@ -96,24 +113,8 @@ function addToCart(event){
    })
   //find the product index 
   var productIndex = product_name.indexOf(element.name)
-
-  if(cart.items && cart.items.length){// if cart item is not empty
-    //get all cart item
-    cart_item = cart.items.map(function(item){
-      return item.name
-    })
-    if(!cart_item.includes(element.name)){ //check duplicate element
-      cart.items.push(products[productIndex])
-      //add()
-      cart.total +=1
-    }
-  }else{
-    //insert product if cart item is empty
-    cart.items.push(products[productIndex])
-    //add()
-    cart.total +=1
-  }
-  console.log(cart)
+  //write to database
+  add(products[productIndex])
 }
 function loadCart(){
   cart.items.forEach(function(item){
@@ -151,16 +152,36 @@ function loadCart(){
   $('#cartRow').append(col)
   })
 }
-function add() {
-  var request = db.transaction(["cart_item"], "readwrite")
-  .objectStore("cart_item")
-  .add(cart.items[0]);
-  
+function add(cart_item) {
+  var request = db.transaction(["cart_product"], "readwrite")
+          .objectStore("cart_product")
+          .add(cart_item)
+                           
   request.onsuccess = function(event) {
-     console.log("item added to database")
+          alert("product has been added to your database.");
   };
-  
+   
   request.onerror = function(event) {
-     alert("Unable to add");
+          alert("Unable to add data\r\nproduct is aready exist in your database! ");       
   }
+   
+}
+
+function readAll() {
+  var objectStore = db.transaction("cart_product").objectStore("cart_product");
+  objectStore.openCursor().onsuccess = function(event) {
+    var cursor = event.target.result;
+    if (cursor) {
+          cart.items.push({name:cursor.value.name,price:cursor.value.price,image:cursor.value.image})
+          cursor.continue();
+    }
+  };  
+    
+}
+
+
+async function init(){
+  await Promise.all([readAll(),loadCart()])
+  $('#cart').css('display','block')
+  $('#products').css('display','none')
 }
