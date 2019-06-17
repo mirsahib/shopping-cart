@@ -11,7 +11,7 @@
   <div class="container">
     <h1 class="display-4">Online Marketplace</h1>
     <h3>Your shopping cart has <span id="itemNo">0</span> items. 
-      <button onclick="showCart(event)" id="showCartBtn" class="btn btn-success">Show Cart</button></h3>
+      <button id="showCartBtn" class="btn btn-success">Show Cart</button></h3>
     <hr class="my-4">
 <!-- Products section -->
 <div id="products" class="jumbotron">
@@ -34,7 +34,7 @@
 <!-- Cart section -->
     <div id="cart" class="jumbotron">
       <h2>Cart</h2>
-      <button onclick="showProduct(event)" class="btn btn-dark btn-sm">Close</button>
+      <button class="btn btn-dark btn-sm" id="close">Close</button>
       <hr class="my-4">
       <div class="row" id = "cartRow">
         <!-- Sample cart item 

@@ -51,8 +51,30 @@ $(document).ready(function(){
   //console.log("Start here");
   // Basic tasks
   // 1. Show / hide cart section on button click (Cart button / close cutton)
+    $('#showCartBtn').click(function(){
+      $('#cart').show()
+      readAll()
+    })
+    $('#close').click(function(){
+      $('#cart').hide()
+    })
   // 2. Dynamically load products to view
-  loadProduct()
+    for(var i=0;i<products.length;i++){
+      var divCol = $('<div class="col-md-4">')
+      var divCard = $('<div class="card">')
+      var img = $('<img  class="card-img-top" src="'+products[i].image+'" />')
+      var cardBody = $('<div class="card-body">')
+      var cardTitle = $('<h5 class="card-title">'+products[i].name+'</h5>')
+      var cardPrice = $('<p class="card-text">$'+ products[i].price+'</p>')
+      var cardBtn = $('<button id="'+i+'" onclick=addToCart(event) class="btn btn-primary">Add to Cart</button>')
+      cardBody.append(cardTitle)
+      cardBody.append(cardPrice)
+      cardBody.append(cardBtn)
+      divCard.append(img)
+      divCard.append(cardBody)
+      divCol.append(divCard)
+      $('#productRow').append(divCol)
+    }
   // 3. Dynamically show total items in Cart
   // 4. Add to cart button functionality
   // 5. Dynamically load cart items
@@ -60,47 +82,7 @@ $(document).ready(function(){
   // 7. Store and load cart from localStorage
 });
 
-function loadProduct(){
-  products.forEach(function(item){
-      //create column
-  var col = document.createElement('div');
-  col.setAttribute('class','col-md-4');
-  //create card
-  var card = document.createElement('div');
-  card.setAttribute('class','card');
-  //create image
-  var img = document.createElement('img');
-  img.setAttribute('class','card-img-top');
-  img.src= item.image;
-  img.alt = item.name
-  //create card body
-  var card_body = document.createElement('div')
-  card_body.setAttribute('class','card-body')
-  //create h5
-  var card_title = document.createElement('h5')
-  card_title.setAttribute('class','card-title')
-  card_title.textContent = item.name
-  //create paragraph
-  var par = document.createElement('p')
-  par.setAttribute('class','card-text')
-  par.textContent = '$ '+item.price
-  //create button
-  var but = document.createElement('button')
-  but.setAttribute('class','btn btn-primary')
-  but.setAttribute('onclick','addToCart(event)')
-  but.id = item.name
-  but.name = item.name
-  but.textContent = 'Add to Cart'
-  card_body.append(card_title)
-  card_body.append(par)
-  card_body.append(but)
 
-  card.append(img);
-  card.append(card_body)
-  col.append(card),
-  $('#productRow').append(col);
-  })
-}
 function showCart(){
   init()
 }
@@ -110,13 +92,9 @@ function showProduct(){
 }
 function addToCart(event){
   var element = event.target
-   product_name = products.map(function(proName){
-     return proName.name;
-   })
-  //find the product index 
-  var productIndex = product_name.indexOf(element.name)
+  console.log(element.id)
   //write to database
-  add(products[productIndex])
+  //add(products[productIndex])
 }
 function loadCart(items){
   items.forEach(function(item){
