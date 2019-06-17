@@ -25,6 +25,8 @@ var cart = {
   items: [],
   total: 0
 };
+
+var cart_length=0
 var db;
 var request = window.indexedDB.open("Cart", 1);
  
@@ -116,8 +118,8 @@ function addToCart(event){
   //write to database
   add(products[productIndex])
 }
-function loadCart(){
-  cart.items.forEach(function(item){
+function loadCart(items){
+  items.forEach(function(item){
       //create column
   var col = document.createElement('div')
   col.setAttribute('class','col-md-4')
@@ -171,17 +173,20 @@ function readAll() {
   var objectStore = db.transaction("cart_product").objectStore("cart_product");
   objectStore.openCursor().onsuccess = function(event) {
     var cursor = event.target.result;
+    var items = []
     if (cursor) {
-          cart.items.push({name:cursor.value.name,price:cursor.value.price,image:cursor.value.image})
+          items.push({name:cursor.value.name,price:cursor.value.price,image:cursor.value.image})
           cursor.continue();
     }
+    loadCart(items)
+    
   };  
     
 }
 
 
 async function init(){
-  await Promise.all([readAll(),loadCart()])
+  await readAll()
   $('#cart').css('display','block')
   $('#products').css('display','none')
 }
