@@ -40,6 +40,7 @@ $(document).ready(function(){
       divCol.append(divCard)
       $('#productRow').append(divCol)
     }
+
   // 3. Dynamically show total items in Cart
   $('#itemNo').text(localStorage.length)
   // 4. Add to cart button functionality
