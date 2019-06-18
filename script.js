@@ -18,7 +18,6 @@ $(document).ready(function(){
   // 1. Show / hide cart section on button click (Cart button / close cutton)
     $('#showCartBtn').click(function(){
       $('#cart').show()
-      //readAll()
       loadCart()
     })
     $('#close').click(function(){
@@ -42,6 +41,7 @@ $(document).ready(function(){
       $('#productRow').append(divCol)
     }
   // 3. Dynamically show total items in Cart
+  $('#itemNo').text(localStorage.length)
   // 4. Add to cart button functionality
   // 5. Dynamically load cart items
   // 6. Implement quantity update for each cart item and update total cost dynamically.
@@ -53,6 +53,7 @@ $(document).ready(function(){
 function addToCart(event){
   var element = event.target
   localStorage.setItem("item_"+element.id,JSON.stringify(products[element.id]))
+  $('#itemNo').text(localStorage.length)
 }
 function loadCart(){
   local = localStorage
