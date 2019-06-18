@@ -1,18 +1,3 @@
-//prefixes of implementation that we want to test
-window.indexedDB = window.indexedDB || window.mozIndexedDB || 
-window.webkitIndexedDB || window.msIndexedDB;
-
-//prefixes of window.IDB objects
-window.IDBTransaction = window.IDBTransaction || 
-window.webkitIDBTransaction || window.msIDBTransaction;
-window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || 
-window.msIDBKeyRange
-
-if (!window.indexedDB) {
-   window.alert("Your browser doesn't support a stable version of IndexedDB.")
-}else{
-  console.log('IndexedDb supporter')
-}
 var products = [
   {name: "Wonder Woman Figurine", price: "12", image: "https://s3.amazonaws.com/mernbook/marketplace/wonder-woman-2977918_960_720.jpg"},
   {name: "Darth Vader Figurine", price: "19", image: "https://s3.amazonaws.com/mernbook/marketplace/star-wars-2463926_960_720.png"},
@@ -26,26 +11,6 @@ var cart = {
   total: 0
 };
 
-var cart_length=0
-var db;
-var request = window.indexedDB.open("Cart", 1);
- 
-request.onerror = function(event) {
-  console.log("error: ");
-};
- 
-request.onsuccess = function(event) {
-  db = request.result;
-  console.log("success: "+ db);
-};
- 
-request.onupgradeneeded = function(event) {
-        var db = event.target.result;
-        var objectStore = db.createObjectStore("cart_product", {keyPath:"name"});
-        for (var i in cart.items) {
-                objectStore.add(cart.items[i]);      
-        }
-}
 
 $(document).ready(function(){
   //console.log("Start here");
@@ -53,7 +18,8 @@ $(document).ready(function(){
   // 1. Show / hide cart section on button click (Cart button / close cutton)
     $('#showCartBtn').click(function(){
       $('#cart').show()
-      readAll()
+      //readAll()
+      loadCart()
     })
     $('#close').click(function(){
       $('#cart').hide()
@@ -83,21 +49,22 @@ $(document).ready(function(){
 });
 
 
-function showCart(){
-  init()
-}
-function showProduct(){
-  $('#products').css('display','block')
-  $('#cart').css('display','none')
-}
+
 function addToCart(event){
   var element = event.target
-  console.log(element.id)
-  //write to database
-  //add(products[productIndex])
+  localStorage.setItem("item_"+element.id,JSON.stringify(products[element.id]))
 }
-function loadCart(items){
-  items.forEach(function(item){
+function loadCart(){
+  local = localStorage
+  items = []
+  for(var i =0;i<local.length;i++){
+    items.push(local.getItem("item_"+i))
+  }
+  if($('#cartRow').html()!=""){
+    $('#cartRow').empty()
+  }
+  for(var i=0;i<items.length;i++){
+    var itemVar = JSON.parse(items[i])
       //create column
   var col = document.createElement('div')
   col.setAttribute('class','col-md-4')
@@ -107,18 +74,18 @@ function loadCart(items){
   //create img
   var img = document.createElement('img')
   img.setAttribute('class','card-img-top')
-  img.src = item.image
+  img.src = itemVar.image
   //create card-body
   var card_body = document.createElement('div')
   card_body.setAttribute('class','card-body')
     //create card-title
     var card_title = document.createElement('h5')
     card_title.setAttribute('class','card-title')
-    card_title.textContent = item.name
+    card_title.textContent = itemVar.name
     //create p
     var par = document.createElement('p')
     par.setAttribute('class','card-text')
-    par.textContent = '$ '+item.price
+    par.textContent = '$ '+itemVar.price
       //create input
       var card_in = document.createElement('input')
       card_in.type = 'number'
@@ -130,41 +97,6 @@ function loadCart(items){
   card.append(card_body)
   col.append(card)  
   $('#cartRow').append(col)
-  })
-}
-function add(cart_item) {
-  var request = db.transaction(["cart_product"], "readwrite")
-          .objectStore("cart_product")
-          .add(cart_item)
-                           
-  request.onsuccess = function(event) {
-          alert("product has been added to your database.");
-  };
-   
-  request.onerror = function(event) {
-          alert("Unable to add data\r\nproduct is aready exist in your database! ");       
   }
-   
 }
 
-function readAll() {
-  var objectStore = db.transaction("cart_product").objectStore("cart_product");
-  objectStore.openCursor().onsuccess = function(event) {
-    var cursor = event.target.result;
-    var items = []
-    if (cursor) {
-          items.push({name:cursor.value.name,price:cursor.value.price,image:cursor.value.image})
-          cursor.continue();
-    }
-    loadCart(items)
-    
-  };  
-    
-}
-
-
-async function init(){
-  await readAll()
-  $('#cart').css('display','block')
-  $('#products').css('display','none')
-}
